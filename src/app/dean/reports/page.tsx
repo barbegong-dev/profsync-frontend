@@ -80,9 +80,9 @@ export default function DeanReports() {
             </div>
 
             <div className="card">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', gap: '1rem', flexWrap: 'wrap' }}>
                     <h2>Departmental Compliance</h2>
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                         <select
                             value={selectedDepartment}
                             onChange={(e) => setSelectedDepartment(e.target.value)}

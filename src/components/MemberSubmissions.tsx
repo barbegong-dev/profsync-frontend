@@ -68,7 +68,7 @@ export default function MemberSubmissions({ apiBase }: { apiBase: string }) {
 
     return (
         <div className="card">
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '2rem', gap: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '2rem', gap: '1rem', minWidth: 0 }}>
                 <Button variant="secondary" size="icon" onClick={() => router.back()} aria-label="Back">
                     <ArrowLeft size={18} />
                 </Button>

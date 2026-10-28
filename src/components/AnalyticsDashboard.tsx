@@ -32,7 +32,7 @@ interface Analytics {
         pending_signups?: number;
     };
     by_department: (Counts & { id: number; name: string; faculty: number; chairs: number; ready: number })[];
-    by_requirement: (Counts & { id: number; name: string; deadline: string | null; is_required: boolean; overdue: number })[];
+    by_requirement: (Counts & { id: number; name: string; deadline: string | null; is_required: boolean; overdue: number; department: string | null })[];
     activity: { week_start: string; uploads: number }[];
     attention: (Counts & { id: number; name: string; department: string | null; overdue: number })[];
     roles: Record<string, number> | null;
@@ -172,6 +172,7 @@ export default function AnalyticsDashboard() {
                                             {r.deadline ? `Due ${new Date(r.deadline).toLocaleDateString()}` : 'No deadline'}
                                             {r.overdue > 0 && <> · <span style={{ color: 'var(--error)', fontWeight: 600 }}>{fmt(r.overdue)} overdue</span></>}
                                             {!r.is_required && ' · optional'}
+                                            {isWorkspace && r.department && ` · ${r.department} only`}
                                         </span>
                                     </div>
                                     <StackBar counts={r} label={r.name} onTip={showTip} onLeave={hideTip} lines={statusLines} />

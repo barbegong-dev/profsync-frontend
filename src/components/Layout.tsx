@@ -47,6 +47,26 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         }
     }, [loading, user, isPublic, router]);
 
+    // Close the mobile menu after navigating anywhere (nav links, Profile, back button)
+    const [menuPath, setMenuPath] = useState(pathname);
+    if (menuPath !== pathname) {
+        setMenuPath(pathname);
+        setIsMobileMenuOpen(false);
+    }
+
+    // While the mobile menu is open: Escape closes it and the page behind does not scroll
+    useEffect(() => {
+        if (!isMobileMenuOpen) return;
+        const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setIsMobileMenuOpen(false);
+        const previousOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        window.addEventListener('keydown', onKey);
+        return () => {
+            document.body.style.overflow = previousOverflow;
+            window.removeEventListener('keydown', onKey);
+        };
+    }, [isMobileMenuOpen]);
+
     if (loading) return (
         <div style={{
             height: '100vh',
@@ -98,6 +118,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             items.push({ name: 'Review Submissions', icon: CheckSquare, href: '/chair/dashboard' });
             items.push({ name: 'Analytics', icon: PieChart, href: '/chair/analytics' });
             items.push({ name: 'Faculty Members', icon: Users, href: '/chair/members' });
+            items.push({ name: 'Semesters', icon: CalendarDays, href: '/chair/semesters' });
+            items.push({ name: 'Requirements', icon: Settings, href: '/chair/requirements' });
         }
         if (roles.includes('dean')) {
             items.push({ name: 'Compliance Reports', icon: BarChart2, href: '/dean/reports' });
@@ -116,6 +138,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
     const navItems = getNavItems();
     const roleName = user?.roles[0]?.name ?? '';
+    const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/');
+    const pageTitle = navItems.find(i => isActive(i.href))?.name || (pathname === '/profile' ? 'Profile' : 'Welcome');
 
     if (isPublic) return <>{children}</>;
 
@@ -127,6 +151,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                     onClick={() => setIsMobileMenuOpen(true)}
                     className="btn btn-ghost btn-icon"
                     aria-label="Open menu"
+                    aria-expanded={isMobileMenuOpen}
+                    aria-controls="app-sidebar"
                 >
                     <Menu size={24} color="var(--text)" />
                 </button>
@@ -143,92 +169,67 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             )}
 
             {/* Sidebar */}
-            <aside className={`sidebar ${isMobileMenuOpen ? 'open' : ''}`}>
-                <div style={{ marginBottom: '2rem' }}>
-                    {/* Sidebar Header (Mobile Only Close Button) */}
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        marginBottom: '2rem',
-                    }}>
-                        {/* Desktop Logo */}
-                        <div className="desktop-only" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <BrandLogo size="sm" />
-                        </div>
-
-                        {/* Mobile Close Button */}
-                        <button
-                            onClick={() => setIsMobileMenuOpen(false)}
-                            className="mobile-close-btn"
-                        >
-                            <ArrowLeft size={20} /> <span style={{ fontSize: '0.875rem' }}>Back</span>
-                        </button>
+            <aside id="app-sidebar" className={`sidebar ${isMobileMenuOpen ? 'open' : ''}`} aria-label="Main navigation">
+                {/* Sidebar Header (Mobile Only Close Button) */}
+                <div className="sidebar-header">
+                    {/* Desktop Logo */}
+                    <div className="desktop-only" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <BrandLogo size="sm" />
                     </div>
 
-                    {/* Profile Section (Centered like image) */}
-                    <div style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        textAlign: 'center',
-                        marginBottom: '2rem'
-                    }}>
-                        <div style={{
-                            width: 80,
-                            height: 80,
-                            borderRadius: '50%',
-                            background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            marginBottom: '1rem',
-                            fontSize: '2rem',
-                            fontWeight: 700,
-                            color: 'white',
-                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                        }}>
-                            {user?.name.charAt(0)}
-                        </div>
-                        <h3 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '0.25rem' }}>{user?.name}</h3>
-                        <p style={{ fontSize: '0.875rem', color: 'var(--primary)', fontWeight: 500 }}>{ROLE_LABELS[roleName] ?? roleName}</p>
-                        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{user?.department?.name || (roleName === 'super_admin' ? 'All workspaces' : '')}</p>
-                        {user?.tenant && (
-                            <div className="workspace-chip" style={{ marginTop: '0.75rem' }}><Building2 size={13} /> {user.tenant.name}</div>
-                        )}
-                    </div>
-
-                    {/* Action Buttons (Profile, Logout, Pill style) */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '2rem' }}>
-                        <Link href="/profile" className="btn btn-primary btn-full" style={{ borderRadius: '9999px', textDecoration: 'none', justifyContent: 'center' }}>
-                            <User size={16} /> Profile
-                        </Link>
-                        <button onClick={logout} className="btn btn-secondary btn-full" style={{ borderRadius: '9999px', justifyContent: 'center' }}>
-                            <LogOut size={16} /> Log out
-                        </button>
-                    </div>
-
-                    {/* Navigation */}
-                    <nav style={{ flex: 1 }}>
-                        <ul style={{ listStyle: 'none' }}>
-                            {navItems.map((item) => (
-                                <li key={item.href}>
-                                    <Link
-                                        href={item.href}
-                                        className={`nav-link ${pathname === item.href ? 'active' : ''}`}
-                                        onClick={() => setIsMobileMenuOpen(false)}
-                                    >
-                                        <item.icon size={20} />
-                                        {item.name}
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </nav>
+                    {/* Mobile Close Button */}
+                    <button
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="mobile-close-btn"
+                    >
+                        <ArrowLeft size={20} /> <span style={{ fontSize: '0.875rem' }}>Back</span>
+                    </button>
                 </div>
 
+                {/* Profile Section */}
+                <div className="sidebar-profile">
+                    <div className="sidebar-avatar">{user?.name.charAt(0)}</div>
+                    <div className="sidebar-profile-text">
+                        <h3>{user?.name}</h3>
+                        <p className="sidebar-role">{ROLE_LABELS[roleName] ?? roleName}</p>
+                        <p className="sidebar-dept">{user?.department?.name || (roleName === 'super_admin' ? 'All workspaces' : '')}</p>
+                        {user?.tenant && (
+                            <div className="workspace-chip" style={{ marginTop: '0.5rem' }}><Building2 size={13} /> {user.tenant.name}</div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Action Buttons (Profile, Logout, Pill style). Below the nav on phones. */}
+                <div className="sidebar-actions">
+                    <Link href="/profile" className="btn btn-primary btn-full" style={{ borderRadius: '9999px', textDecoration: 'none', justifyContent: 'center' }}>
+                        <User size={16} /> Profile
+                    </Link>
+                    <button onClick={logout} className="btn btn-secondary btn-full" style={{ borderRadius: '9999px', justifyContent: 'center' }}>
+                        <LogOut size={16} /> Log out
+                    </button>
+                </div>
+
+                {/* Navigation */}
+                <nav className="sidebar-nav">
+                    <ul style={{ listStyle: 'none' }}>
+                        {navItems.map((item) => (
+                            <li key={item.href}>
+                                <Link
+                                    href={item.href}
+                                    className={`nav-link ${isActive(item.href) ? 'active' : ''}`}
+                                    aria-current={isActive(item.href) ? 'page' : undefined}
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                >
+                                    <item.icon size={20} />
+                                    {item.name}
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                </nav>
+
                 {/* Footer Info */}
-                <div style={{ marginTop: 'auto', textAlign: 'center', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                <div className="sidebar-footer">
                     <p>ProfSync v1.0.0</p>
                 </div>
             </aside>
@@ -236,11 +237,12 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             <main className="main-content">
                 <header className="desktop-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                     <div>
-                        <h1 style={{ marginBottom: '0.25rem', fontSize: '1.75rem' }}>{navItems.find(i => i.href === pathname)?.name || 'Welcome'}</h1>
+                        <h1 style={{ marginBottom: '0.25rem', fontSize: '1.75rem' }}>{pageTitle}</h1>
                         <p className="text-muted">Signed in as {ROLE_LABELS[roleName] ?? roleName}{user?.tenant ? ` · ${user.tenant.name}` : ''}</p>
                     </div>
                     <NotificationBell />
                 </header>
+                <h1 className="mobile-page-title">{pageTitle}</h1>
                 <div className="fade-in">
                     {children}
                 </div>

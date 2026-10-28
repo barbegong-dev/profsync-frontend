@@ -210,6 +210,97 @@ button {
   padding: 1.25rem 1.5rem;
 }
 
+/* Sidebar contents */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+.sidebar-profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.sidebar-avatar {
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-profile-text {
+  min-width: 0;
+}
+
+.sidebar-profile h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  overflow-wrap: anywhere;
+}
+
+.sidebar-role {
+  font-size: 0.875rem;
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.sidebar-dept {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.sidebar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.sidebar-nav {
+  margin-bottom: 2rem;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.mobile-page-title {
+  display: none;
+}
+
+/* Tablet: narrower sidebar and less padding so content has room */
+@media (max-width: 1100px) and (min-width: 769px) {
+  :root {
+    --sidebar-width: 240px;
+  }
+
+  .sidebar {
+    padding: 1.5rem 1rem;
+  }
+
+  .main-content {
+    padding: 1.5rem;
+  }
+}
+
 /* Mobile */
 @media (max-width: 768px) {
   .sidebar {
@@ -217,15 +308,91 @@ button {
     top: 0;
     left: 0;
     margin: 0;
+    width: min(86vw, 320px);
     height: 100vh;
+    height: 100dvh; /* excludes the phone's address bar */
+    padding: 1.25rem 1.25rem calc(1.25rem + env(safe-area-inset-bottom));
     border-radius: 0 1.5rem 1.5rem 0;
     background: var(--glass-strong);
     transform: translateX(-110%);
+    visibility: hidden; /* keeps the hidden menu out of the tab order */
+    overscroll-behavior: contain;
+    transition: transform 0.3s ease-in-out, visibility 0s linear 0.3s;
   }
 
   .sidebar.open {
     transform: translateX(0);
+    visibility: visible;
     box-shadow: var(--glass-shadow-lg);
+    transition: transform 0.3s ease-in-out, visibility 0s;
+  }
+
+  /* Compact profile row so the links fit on screen; Profile / Log out move below the links */
+  .sidebar-header {
+    margin-bottom: 1rem;
+  }
+
+  .sidebar-profile {
+    flex-direction: row;
+    align-items: center;
+    text-align: left;
+    gap: 0.85rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sidebar-avatar {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 0;
+    font-size: 1.25rem;
+  }
+
+  .sidebar-profile h3 {
+    font-size: 1rem;
+    margin-bottom: 0;
+  }
+
+  .sidebar-nav {
+    order: 1;
+    margin-bottom: 1.25rem;
+  }
+
+  .nav-link {
+    padding: 0.7rem 1rem;
+    margin-bottom: 0.25rem;
+    min-height: 44px;
+  }
+
+  .sidebar-actions {
+    order: 2;
+    flex-direction: row;
+    margin-bottom: 1rem;
+  }
+
+  .sidebar-actions .btn {
+    flex: 1;
+  }
+
+  .sidebar-footer {
+    order: 3;
+  }
+
+  .mobile-page-title {
+    display: block;
+    font-size: 1.4rem !important;
+    margin: 0 0 1rem;
+  }
+
+  /* Wide tables (e.g. the compliance matrix) also stack instead of scrolling sideways */
+  table {
+    min-width: 0 !important;
+  }
+
+  th,
+  td {
+    position: static !important;
   }
 
   .main-content {

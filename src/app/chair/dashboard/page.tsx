@@ -251,11 +251,11 @@ export default function ChairDashboard() {
                                             })
                                             .map(fac => (
                                                 <tr key={fac.id}>
-                                                    <td style={{ position: 'sticky', left: 0, backgroundColor: 'rgba(255,255,255,0.9)', fontWeight: 600 }}>
+                                                    <td data-label="Faculty" style={{ position: 'sticky', left: 0, backgroundColor: 'rgba(255,255,255,0.9)', fontWeight: 600 }}>
                                                         {fac.name}
                                                         {fac.email && <div style={{ fontSize: '0.75rem', fontWeight: 400, color: 'var(--text-muted)' }}>{fac.email}</div>}
                                                     </td>
-                                                    <td>
+                                                    <td data-label="Clearance">
                                                         {fac.is_ready_for_clearance ? (
                                                             <span className="badge badge-approved" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontWeight: 700, padding: '0.35rem 0.75rem' }}>
                                                                 <CheckCircle2 size={13} /> READY FOR CLEARANCE
@@ -267,7 +267,7 @@ export default function ChairDashboard() {
                                                         )}
                                                     </td>
                                                     {fac.submissions.map(sub => (
-                                                        <td key={sub.requirement_id} style={{ textAlign: 'center' }}>
+                                                        <td key={sub.requirement_id} data-label={sub.requirement_name} style={{ textAlign: 'center' }}>
                                                             <span className={`badge badge-${sub.status === 'missing' ? 'rejected' : sub.status}`}>
                                                                 {sub.status === 'missing' ? 'MISSING' : sub.status.toUpperCase()}
                                                             </span>
