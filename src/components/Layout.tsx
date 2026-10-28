@@ -15,7 +15,8 @@ import {
     Building2,
     CalendarDays,
     Rocket,
-    Layers
+    Layers,
+    PieChart
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -95,12 +96,15 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         }
         if (roles.includes('program_chair')) {
             items.push({ name: 'Review Submissions', icon: CheckSquare, href: '/chair/dashboard' });
+            items.push({ name: 'Analytics', icon: PieChart, href: '/chair/analytics' });
+            items.push({ name: 'Faculty Members', icon: Users, href: '/chair/members' });
         }
         if (roles.includes('dean')) {
             items.push({ name: 'Compliance Reports', icon: BarChart2, href: '/dean/reports' });
         }
         if (roles.includes('admin')) {
             items.push({ name: 'Setup Guide', icon: Rocket, href: '/admin/setup' });
+            items.push({ name: 'Analytics', icon: PieChart, href: '/admin/analytics' });
             items.push({ name: 'Members', icon: Users, href: '/admin/users' });
             items.push({ name: 'Departments', icon: Building2, href: '/admin/departments' });
             items.push({ name: 'Semesters', icon: CalendarDays, href: '/admin/semesters' });

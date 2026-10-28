@@ -68,7 +68,7 @@ export default function SetupGuide() {
         {
             icon: UserCheck,
             title: 'Approve sign-ups and assign roles',
-            body: 'For each pending user pick a role (Faculty, Program Chair, Dean) and a department. Each department needs at least one Program Chair to review submissions.',
+            body: 'For each pending user pick a role (Faculty, Program Chair, Dean) and a department. Each department needs a Program Chair (up to two) to review submissions. Chairs can then add and manage the faculty of their own department.',
             done: status.pending === 0 && status.chairs > 0,
             detail: status.pending > 0 ? `${status.pending} waiting for approval` : `${status.chairs} program chair${status.chairs === 1 ? '' : 's'}`,
             href: '/admin/users',
